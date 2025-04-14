@@ -41,7 +41,45 @@ return {
       templates = {
         subdir = "templates",
       },
+
+      follow_url_func = function(url)
+        local opener
+        if vim.fn.has("mac") == 1 then
+          opener = "open"
+        elseif vim.fn.has("unix") == 1 then
+          opener = "xdg-open"
+        elseif vim.fn.has("win32") == 1 then
+          opener = "start"
+        end
+
+        if opener then
+          vim.fn.jobstart({ opener, url }, { detach = true })
+        else
+          print("No valid URL opener found for this OS.")
+        end
+      end,
     }
+  end,
+  config = function(_, opts)
+    local obsidian = require("obsidian")
+    local Note = require("obsidian.note")
+    local Path = require("plenary.path")
+
+    -- Initialize the obsidian.nvim plugin with the provided options
+    obsidian.setup(opts)
+
+    -- Define a simple function to return the timestamp of exactly one day ago (ignores working days)
+    local function simple_day_before()
+      return os.time() - 86400 -- subtract 24 hours from current time
+    end
+
+    -- Get the current Obsidian client
+    local client = obsidian.get_client()
+
+    -- Override the default 'yesterday' method on the client to use simple_day_before instead of working_day_before
+    client.yesterday = function(self)
+      return self:_daily(simple_day_before())
+    end
   end,
   keys = {
     -- Note creation
