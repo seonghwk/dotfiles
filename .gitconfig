@@ -1,8 +1,11 @@
 # This is Git's per-user configuration file.
-; [user]
-; # Please adapt and uncomment the following lines:
-;   name = Seonghwan Kim
-;   email = seonghwan1031@gmail.com
+[user]
+# Please adapt and uncomment the following lines:
+  name = seonghwan3.kim
+  email = seonghwan3.kim@lge.com
+
+[include]
+  path = ~/.gitconfig.local
 
 # clearly makes git better
 
