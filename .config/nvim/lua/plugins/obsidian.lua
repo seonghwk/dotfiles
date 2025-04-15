@@ -58,6 +58,15 @@ return {
           print("No valid URL opener found for this OS.")
         end
       end,
+      -- create file name as title
+      note_id_func = function(title)
+        if title ~= nil then
+          -- return title:gsub(" ", "-"):gsub("[^a-zA-Z0-9%-]", ""):lower()
+          return title:gsub(" ", "_"):gsub("[^%w_%-]", "")
+        else
+          return tostring(os.time())
+        end
+      end,
     }
   end,
   config = function(_, opts)
@@ -98,6 +107,8 @@ return {
     { "<leader>os", "<cmd>ObsidianSearch<cr>", desc = "Search in vault" },
     { "<leader>og", "<cmd>Telescope live_grep<cr>", desc = "Search contents in vault" },
     -- { "<leader>otg", "<cmd>Telescope tags<cr>", desc = "Search tags" },
+
+    { "<leader>or", "<cmd>ObsidianRename<cr>", desc = "Rename current note (and update links)" },
   },
   -- see below for full list of options 👇
 }
