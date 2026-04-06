@@ -9,24 +9,25 @@ install_pkg() {
     brew install "$@"
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get update
-    # Debian/Ubuntu 특화 이름 처리
     for pkg in "$@"; do
       case $pkg in
-        bat) sudo apt-get install -y bat ;;
-        fd) sudo apt-get install -y fd-find ;;
-        nvim) sudo apt-get install -y neovim ;;
+        bat) sudo apt-get install -y bat || echo "Failed to install bat via apt" ;;
+        fd) sudo apt-get install -y fd-find || echo "Failed to install fd-find via apt" ;;
+        nvim) sudo apt-get install -y neovim || echo "Failed to install neovim via apt" ;;
         starship) curl -sS https://starship.rs/install.sh | sh -s -- -y ;;
-        eza)
-          echo "eza: Please install via official repo or cargo if needed."
+        lazygit) 
+          # lazygit이 apt에 없을 경우 무시하거나 나중에 수동 설치 안내
+          sudo apt-get install -y lazygit || echo "lazygit not found in apt, skipping..." 
           ;;
-        *) sudo apt-get install -y "$pkg" ;;
+        *) sudo apt-get install -y "$pkg" || echo "Failed to install $pkg via apt" ;;
       esac
     done
   fi
 }
 
 # 공통 도구 목록
-CORE_TOOLS=(zoxide fzf ripgrep tmux nvim starship bat fd eza lazygit)
+# (라즈베리파이의 성능을 고려하여 eza는 설치 시도만 함)
+CORE_TOOLS=(zoxide fzf ripgrep tmux nvim starship bat fd lazygit)
 
 # 실행
 install_pkg "${CORE_TOOLS[@]}"
