@@ -1,0 +1,24 @@
+{{ if eq .chezmoi.os "windows" -}}
+# Windows 전용 VS Code 확장 프로그램 자동 설치 스크립트
+
+# 1. 'code' 명령어가 존재하는지 확인
+if (Get-Command code -ErrorAction SilentlyContinue) {
+    $extensionFile = "$HOME\.local\share\chezmoi\common\vscode-extensions.txt"
+    
+    if (Test-Path $extensionFile) {
+        Write-Host "==> Detecting VS Code. Installing extensions for Windows..."
+        $extensions = Get-Content $extensionFile
+        
+        foreach ($ext in $extensions) {
+            if (-not [string]::IsNullOrWhiteSpace($ext) -and -not $ext.StartsWith("#")) {
+                Write-Host "Installing extension: $ext"
+                code --install-extension $ext --force
+            }
+        }
+        Write-Host "==> VS Code extensions installed successfully!"
+    }
+}
+else {
+    Write-Host "==> VS Code (code) not found. Skipping extension installation."
+}
+{{ end -}}

@@ -21,6 +21,24 @@ alias cat='bat'
 alias grep='rg'
 alias lg='lazygit'
 
+# 5. VS Code 백업 및 동기화 Alias (Terminal Master Tool)
+# vcs (VS Code Save): 현재 설정과 익스텐션을 백업하고 푸시
+vcs() {
+    # 1. 설정 백업 (common 폴더로 복사)
+    cp "$HOME/Library/Application Support/Code/User/settings.json" "$(chezmoi source-path)/common/vscode-settings.json"
+    
+    # 2. 익스텐션 목록 추출
+    code --list-extensions > "$(chezmoi source-path)/common/vscode-extensions.txt"
+    
+    # 3. chezmoi 동기화 및 푸시
+    chezmoi cd
+    git add .
+    git commit -m "feat: backup vscode settings and extensions via vcs"
+    git push
+    echo "==> VS Code settings and extensions backed up successfully!"
+    exit
+}
+
 # 5. History 설정 (명령어 기록 유지)
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
