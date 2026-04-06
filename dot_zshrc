@@ -1,1 +1,29 @@
-export PATH=/opt/homebrew/bin:$PATH
+# 0. Homebrew 환경 설정 (Mac & Linux/WSL 공통)
+if [[ -d "/opt/homebrew" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -d "/home/linuxbrew/.linuxbrew" ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# 1. Starship 프롬프트 활성화
+eval "$(starship init zsh)"
+
+# 2. zoxide (Smarter cd) 활성화
+eval "$(zoxide init zsh)"
+
+# 3. fzf (Fuzzy Finder) 활성화
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# 4. 전문가용 Alias (별칭) 설정
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -l --icons --group-directories-first'
+alias cat='bat'
+alias grep='rg'
+alias lg='lazygit'
+
+# 5. History 설정 (명령어 기록 유지)
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
