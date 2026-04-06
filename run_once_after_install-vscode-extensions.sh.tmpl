@@ -1,20 +1,16 @@
 {{ if ne .chezmoi.os "windows" -}}
 #!/bin/bash
 
-# VS Code가 설치되어 있을 때만 실행
+# VS Code가 설치되어 있고, 익스텐션 목록 파일이 있을 때만 실행
 if command -v code >/dev/null 2>&1; then
-    echo "==> Installing VS Code Extensions..."
-    EXTENSIONS=(
-        vscodevim.vim
-        ms-python.python
-        ms-toolsai.jupyter
-        ms-vscode.cpptools
-        catppuccin.catppuccin-vsc
-        PKief.material-icon-theme
-        usernamehw.errorlens
-    )
-    for ext in "${EXTENSIONS[@]}"; do
-        code --install-extension "$ext" --force
-    done
+    EXTENSION_FILE="{{ .chezmoi.sourceDir }}/common/vscode-extensions.txt"
+    if [ -f "$EXTENSION_FILE" ]; then
+        echo "==> Installing VS Code Extensions from list..."
+        while IFS= read -r ext; do
+            # 비어있는 줄이거나 주석인 경우 건너뜀
+            [[ -z "$ext" || "$ext" == \#* ]] && continue
+            code --install-extension "$ext" --force
+        done < "$EXTENSION_FILE"
+    fi
 fi
 {{ end -}}
