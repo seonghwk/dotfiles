@@ -1,0 +1,42 @@
+{
+    // 1. Vim 에뮬레이션 (Vim-centric Life)
+    "vim.smartRelativeLine": true,
+    "vim.useSystemClipboard": true,
+    "editor.lineNumbers": "relative",
+    "vim.highlightedyank.enable": true,
+
+    // 2. 테마 및 폰트 (Minimalist Visuals)
+    "workbench.colorTheme": "Catppuccin Macchiato",
+    "workbench.iconTheme": "material-icon-theme",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Hack Nerd Font', 'Menlo', 'Monaco', 'Courier New', monospace",
+    "editor.fontSize": 14,
+    "editor.lineHeight": 22,
+    "editor.letterSpacing": 0.5,
+
+    // 3. UI 정리 (Minimalist UI)
+    "editor.minimap.enabled": false,
+    "workbench.activityBar.location": "hidden",
+    "workbench.statusBar.visible": true,
+    "editor.renderWhitespace": "trailing",
+    "editor.cursorBlinking": "solid",
+    "editor.cursorStyle": "block",
+    "editor.scrollbar.vertical": "hidden",
+    "editor.scrollbar.horizontal": "hidden",
+
+    // 4. 업무 특화 (C/C++ & Python)
+    "python.terminal.activateEnvInSelectedTerminal": true,
+    "jupyter.askForKernelRestart": false,
+    "editor.formatOnSave": true,
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+
+    // 5. 터미널 통합 (Terminal Native)
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font'",
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.cursorStyle": "block",
+
+    // 6. 기타 설정
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "files.autoSave": "onFocusChange"
+}
