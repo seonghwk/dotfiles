@@ -1,3 +1,4 @@
+{{ if eq .chezmoi.os "windows" -}}
 # Windows 전용 VS Code 설정 동기화 스크립트 (PowerShell)
 
 $source = "$HOME\.local\share\chezmoi\common\vscode-settings.json"
@@ -24,3 +25,4 @@ if (Test-Path $source) {
 else {
     Write-Warning "Source settings file not found at $source"
 }
+{{ end -}}
