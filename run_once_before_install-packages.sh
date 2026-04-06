@@ -1,38 +1,32 @@
 #!/bin/bash
 
-# 패키지 설치 함수
-install_pkg() {
-  if [[ "$OSTYPE" == "darwin"* ]]; then
-    brew install "$@"
-  elif command -v brew >/dev/null 2>&1; then
-    brew install "$@"
-  elif command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get update
-    # Debian/Ubuntu 특화 이름 처리
-    for pkg in "$@"; do
-      case $pkg in
-        bat) sudo apt-get install -y bat ;;
-        fd) sudo apt-get install -y fd-find ;;
-        nvim) sudo apt-get install -y neovim ;;
-        starship) curl -sS https://starship.rs/install.sh | sh -s -- -y ;;
-        eza)
-          # eza는 공식 레포를 추가해야 할 수도 있으므로, 여기서는 설치 가이드 정도로 대체하거나 cargo 이용 고려
-          # (간단하게 skip하거나 curl 설치 유도)
-          echo "eza: Please install via official repo or cargo if needed."
-          ;;
-        *) sudo apt-get install -y "$pkg" ;;
-      esac
-    done
-  fi
+# 1. Homebrew 설치 함수 (Linux 전용)
+install_homebrew() {
+    if ! command -v brew >/dev/null 2>&1; then
+        echo "==> Homebrew not found. Installing Homebrew..."
+        # 비대화형 모드로 Homebrew 설치
+        NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
+        # 쉘 세션에 brew 경로 즉시 반영 (Linux 표준 경로)
+        if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+            eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        fi
+    fi
 }
 
-# 공통 도구 목록
-CORE_TOOLS=(zoxide fzf ripgrep tmux)
-
-# macOS 또는 Homebrew가 있는 Linux
-if [[ "$OSTYPE" == "darwin"* ]] || command -v brew >/dev/null 2>&1; then
-  install_pkg starship zoxide fzf ripgrep bat eza fd tmux nvim
-else
-  # 라즈베리파이/Debian (Homebrew 없는 경우)
-  install_pkg "${CORE_TOOLS[@]}" bat fd nvim starship
+# 2. 메인 설치 로직
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS: 이미 brew가 있을 것이므로 바로 설치
+    brew install starship zoxide fzf ripgrep bat eza fd tmux nvim lazygit
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Linux (WSL, RPi 등): Homebrew 설치 확인 후 진행
+    install_homebrew
+    
+    # 쉘 세션에 brew 경로 반영 (설치 직후 바로 사용하기 위함)
+    if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+    fi
+    
+    # 설치된 brew로 최신 도구들 설치
+    brew install starship zoxide fzf ripgrep bat eza fd tmux nvim lazygit
 fi
