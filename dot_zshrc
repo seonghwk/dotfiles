@@ -39,6 +39,17 @@ vcs() {
     exit
 }
 
+# vcr (VS Code Revert): 모든 수정을 취소하고 GitHub의 골든 스테이트로 복구
+vcr() {
+    echo "==> Reverting to the latest Golden State from GitHub..."
+    chezmoi cd
+    git fetch origin main
+    git reset --hard origin/main
+    cd -
+    chezmoi apply --force
+    echo "==> Your environment has been reset to the Golden State!"
+}
+
 # 5. History 설정 (명령어 기록 유지)
 HISTFILE=~/.zsh_history
 HISTSIZE=10000

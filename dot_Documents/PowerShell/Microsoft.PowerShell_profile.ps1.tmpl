@@ -1,0 +1,29 @@
+{{ if eq .chezmoi.os "windows" -}}
+# 1. Prompt & Zoxide
+Invoke-Expression (&starship init powershell)
+Invoke-Expression (&zoxide init powershell)
+
+# 2. Aliases
+function ls { eza --icons --group-directories-first $args }
+function ll { eza -l --icons --group-directories-first $args }
+Set-Alias lg lazygit
+Set-Alias vi nvim
+Set-Alias vim nvim
+
+# 3. vcs (VS Code Save) - PowerShell version
+function vcs {
+    Write-Host "==> Backing up VS Code settings and extensions..." -ForegroundColor Cyan
+    $sourceDir = (chezmoi source-path)
+    $appdata = $env:APPDATA
+    Copy-Item "$appdata\Code\User\settings.json" "$sourceDir\common\vscode-settings.json" -Force
+    code --list-extensions | Out-File -FilePath "$sourceDir\common\vscode-extensions.txt" -Encoding utf8
+    cd $sourceDir
+    git add .
+    git commit -m "feat: backup vscode settings and extensions via vcs (Windows)"
+    git push
+    cd $HOME
+    Write-Host "==> VS Code settings and extensions backed up successfully!" -ForegroundColor Green
+}
+
+Write-Host "Terminal Master Profile Loaded!" -ForegroundColor Yellow
+{{ end -}}
