@@ -6,9 +6,9 @@
 
 ## 🎯 프로젝트의 목표 (The Goal)
 - **Zero-GUI Workflow:** 마우스 없이 키보드만으로 모든 조작을 수행하는 환경 구축.
-- **Cross-Platform Portability:** `chezmoi`와 `Homebrew`를 활용하여 어떤 OS에서도 5분 안에 동일한 환경 복구.
-- **Modern & Fast:** Rust/Go 기반의 최신 도구들을 사용하여 압축적인 속도와 가벼운 성능 확보.
-- **Traceable Changes:** 모든 설정 변화를 Git으로 기록하여 나의 성장 궤적을 관리.
+- **Single Source of Truth:** 모든 설정(Terminal, Editor, IDE)을 `chezmoi`와 Git으로 중앙 통제.
+- **Cross-Platform Portability:** 어떤 OS에서도 5분 안에 동일한 환경(VS Code 포함) 복구.
+- **Thinking in Typing:** 모든 제어권을 타이핑으로 수행하여 "손가락으로 생각하는 개발" 지향.
 
 ---
 
@@ -16,23 +16,25 @@
 
 ### 1. 기반 인프라 구축
 - [x] **Dotfiles Management:** `chezmoi`를 도입하여 설정 파일의 중앙 관리 및 동기화 체계 마련.
-- [x] **Smart Installation:** `run_once_before_install-packages.sh` 스크립트를 통해 OS별 패키지 자동 설치 자동화.
-- [x] **Homebrew on Linux:** WSL 및 라즈베리파이에서 최신 도구를 사용하기 위한 Homebrew 환경 구축.
+- [x] **Smart Installation:** OS 및 패키지 매니저를 감지하여 도구를 자동 설치하는 지능형 스크립트 작성.
+- [x] **Homebrew on Linux:** WSL 및 라즈베리파이에서 최신 도구(Neovim 0.10+ 등)를 사용하기 위한 환경 구축.
 
 ### 2. 핵심 도구 설정 (The Golden Stack)
-- [x] **Shell (Zsh):** Starship 프롬프트와 zoxide, fzf 연동으로 스마트한 네비게이션 구현.
-- [x] **Multiplexer (Tmux):** 세션 유지 및 화면 분할을 위한 전문가용 `.tmux.conf` 설정 (Prefix: `Ctrl-a`).
+- [x] **Shell (Zsh):** Starship 프롬프트, zoxide, fzf 연동으로 스마트한 네비게이션 구현.
+- [x] **Multiplexer (Tmux):** 세션 유지 및 화면 분할을 위한 전문가용 설정 (Prefix: `Ctrl-a`).
 - [x] **Editor (Neovim):** `Lazy.nvim` 기반의 모던한 플러그인 관리 체계 및 기본 테마(Catppuccin) 적용.
 
-### 3. 주요 자동화 스크립트
-- [x] Mac/Linux/WSL/RPi 통합 설치 스크립트 작성.
-- [x] WSL 권한 문제 해결을 위한 Homebrew 표준 경로 대응 로직.
+### 3. IDE 통합 (VS Code Master Strategy)
+- [x] **Start from Scratch:** 기존 설정을 완전히 초기화하고 `chezmoi` 기반의 관리 체계로 전환.
+- [x] **Universal Sync:** 단 하나의 `common/vscode-settings.json`을 사용하여 Mac/Linux/WSL의 설정을 심볼릭 링크로 통합 관리.
+- [x] **Automated Extensions:** `vscodevim`, `python`, `jupyter`, `cpptools` 등 필수 확장 프로그램 자동 설치 스크립트 구축.
+- [x] **Vim-centric Setup:** VS Code 내에서도 상대 줄 번호와 Vim 모드를 완벽하게 지원하도록 구성.
 
 ---
 
 ## 🛠️ 설치 및 복구 방법 (Quick Start)
 
-새로운 환경에서 아래 명령어 한 줄이면 모든 세팅이 완료됩니다:
+새로운 환경에서 아래 명령어 한 줄이면 모든 세팅(Terminal + VS Code)이 완료됩니다:
 
 ```bash
 # 1. (WSL/Linux인 경우) Homebrew 표준 경로 선점 (단 한 번만 수행)
@@ -48,16 +50,16 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply seonghwk
 
 ### 1단계: Neovim을 진정한 IDE로 (LSP & Treesitter)
 - [ ] **LSP(Language Server Protocol):** 코드 자동 완성, 정의 이동, 실시간 에러 체크 활성화.
-- [ ] **Treesitter:** 정교한 구문 강조를 통한 코드 가독성 극대화.
 - [ ] **Telescope:** 파일 및 텍스트 검색을 위한 퍼지 파인더 고도화.
+- [ ] **Call Hierarchy:** Source Insight를 대체하는 강력한 코드 분석 기능 구현.
 
-### 2단계: 워크플로우 통합
-- [ ] **LazyGit:** 터미널 기반의 시각적 Git 관리 도구 숙달.
-- [ ] **Yazi:** Rust 기반의 초고속 터미널 파일 매니저 도입 및 습관화.
+### 2단계: AI & 임베디드 워크플로우
+- [ ] **AI Integration:** `Gemini CLI`, `Claude Code` 및 `Ollama` 원격 서버를 터미널 워크플로우에 통합.
+- [ ] **Embedded Build:** WSL 내에서 Renesas CC-RX Windows 컴파일러를 호출하는 빌드 자동화 스크립트 작성.
 
 ### 3단계: 머슬 메모리 (Muscle Memory)
-- [ ] Vim Motions (`hjkl`, Text Objects) 체화.
-- [ ] Tmux 창 관리 및 세션 전환 단축키 숙달.
+- [ ] Vim Motions (`hjkl`, Text Objects) 및 Tmux 단축키 체화.
+- [ ] 모든 업무를 GUI 없이 터미널 내에서 완결하는 습관 형성.
 
 ---
 
