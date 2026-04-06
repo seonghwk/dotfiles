@@ -4,31 +4,46 @@
 
 ---
 
-## 🎯 프로젝트의 목표 (The Goal)
-- **Zero-GUI Workflow:** 마우스 없이 키보드만으로 모든 조작을 수행하는 환경 구축.
-- **Single Source of Truth:** 모든 설정(Terminal, Editor, IDE)을 `chezmoi`와 Git으로 중앙 통제.
-- **Cross-Platform Portability:** 어떤 OS에서도 5분 안에 동일한 환경(VS Code 포함) 복구.
-- **Thinking in Typing:** 모든 제어권을 타이핑으로 수행하여 "손가락으로 생각하는 개발" 지향.
+## 🏗️ 아키텍처 및 구조 (Architecture & Structure)
+
+본 프로젝트는 **`chezmoi`**의 지능형 템플릿 기능을 활용하여, 서로 다른 4개의 OS 환경(Mac, WSL, RPi, Windows)을 단 하나의 저장소로 완벽하게 통제합니다.
+
+### 1. 디렉토리 구조 (Directory Map)
+```text
+dotfiles/
+├── common/                # [Universal] 모든 OS에서 공유하는 앱 설정 (예: VS Code)
+├── dot_zshrc              # [Static] 쉘 환경 설정
+├── dot_tmux.conf          # [Static] 터미널 멀티플렉서 설정
+├── private_dot_config/    # [App-Specific] Neovim 등 상세 앱 설정
+│   └── nvim/init.lua
+├── run_once_before_...    # [Bootstrap] 패키지 자동 설치 로직
+│   ├── .sh.tmpl           #  -> macOS / Linux 전용 (brew/apt)
+│   └── .ps1.tmpl          #  -> Windows Native 전용 (choco)
+└── run_once_after_...     # [Post-Install] 플러그인 설치 및 심볼릭 링크 생성
+```
+
+### 2. 설계 철학: 템플릿 격리 (Template Isolation)
+모든 실행 스크립트(`.sh`, `.ps1`)는 **`.tmpl`** 확장자를 통해 관리됩니다. 이는 `chezmoi`가 실행 시점에 대상 OS를 감지하여 **해당 OS에 맞는 스크립트만 생성하고 실행**하게 합니다.
+- **Win32 에러 방지:** Windows에서는 `.sh` 파일이 생성조차 되지 않으므로, 유닉스용 스크립트 실행 시도로 인한 에러가 원천 차단됩니다.
+- **Single Source of Truth:** `common/` 내의 설정 파일을 각 OS의 경로에 심볼릭 링크(또는 하드링크)로 연결하여, 단 하나의 파일 수정으로 모든 플랫폼의 IDE 설정을 동기화합니다.
 
 ---
 
 ## ✅ 현재까지 진행된 사항 (What We've Done)
 
 ### 1. 기반 인프라 구축
-- [x] **Dotfiles Management:** `chezmoi`를 도입하여 설정 파일의 중앙 관리 및 동기화 체계 마련.
-- [x] **Smart Installation:** OS 및 패키지 매니저를 감지하여 도구를 자동 설치하는 지능형 스크립트 작성.
-- [x] **Homebrew on Linux:** WSL 및 라즈베리파이에서 최신 도구(Neovim 0.10+ 등)를 사용하기 위한 환경 구축.
+- [x] **Multi-Platform Sync:** `chezmoi` 템플릿을 통한 Mac/WSL/RPi/Windows 통합 관리 체계.
+- [x] **Smart Installation:** OS 및 패키지 매니저별 자동 설치 스크립트 격리 구현.
+- [x] **Homebrew on Linux:** 저사양 RPi 및 WSL에서 최신 도구를 사용하기 위한 환경 최적화.
 
 ### 2. 핵심 도구 설정 (The Golden Stack)
-- [x] **Shell (Zsh/PowerShell):** Starship 프롬프트, zoxide, fzf 연동으로 스마트한 네비게이션 구현.
-- [x] **Multiplexer (Tmux):** 세션 유지 및 화면 분할을 위한 전문가용 설정 (Prefix: `Ctrl-a`).
-- [x] **Editor (Neovim):** `Lazy.nvim` 기반의 모던한 플러그인 관리 체계 및 기본 테마(Catppuccin) 적용.
+- [x] **Shell (Zsh):** Starship, zoxide, fzf 기반의 스마트 네비게이션.
+- [x] **Multiplexer (Tmux):** 전문가용 분할 레이아웃 및 세션 유지 (Prefix: `Ctrl-a`).
+- [x] **Editor (Neovim):** `Lazy.nvim` 기반의 모던 플러그인 체계 및 Catppuccin 테마.
 
-### 3. IDE 통합 (VS Code Master Strategy)
-- [x] **Start from Scratch:** 기존 설정을 완전히 초기화하고 `chezmoi` 기반의 관리 체계로 전환.
-- [x] **Universal Sync:** 단 하나의 `common/vscode-settings.json`을 사용하여 Mac/Linux/WSL/Windows의 설정을 완벽 동기화.
-- [x] **Native Support:** Windows 환경을 위한 PowerShell 전용 동기화 스크립트(`run_onchange_...ps1`) 구축.
-- [x] **Automated Extensions:** 필수 확장 프로그램(`vscodevim`, `python`, `jupyter`, `cpptools` 등) 자동 설치 체계 구축.
+### 3. IDE 통합 (VS Code Master)
+- [x] **Universal Sync:** `common/vscode-settings.json` 하나로 전 OS IDE 설정 통합.
+- [x] **Native Support:** Windows PowerShell 전용 동기화 스크립트(`ps1.tmpl`) 구축.
 
 ---
 
@@ -48,24 +63,13 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply seonghwk
 # 1. chezmoi 설치 (관리자 권한 PowerShell)
 winget install chezmoi  # 또는 choco install chezmoi
 
-# 2. 설정 적용 (PATH 인식이 안 될 경우 터미널 재시작 후 실행)
+# 2. 설정 적용
 chezmoi init --apply seonghwk
 ```
-*Tip: Windows에서 명령어가 인식되지 않으면 `$env:Path` 환경 변수에 `C:\ProgramData\chocolatey\bin` 또는 설치 경로가 포함되어 있는지 확인하세요.*
 
 ---
 
-## 🚀 향후 로드맵 (Next Steps & Goals)
-
-### 1단계: Neovim을 진정한 IDE로 (LSP & Treesitter)
-- [ ] **LSP(Language Server Protocol):** 코드 자동 완성, 정의 이동, 실시간 에러 체크 활성화.
-- [ ] **Telescope:** 파일 및 텍스트 검색을 위한 퍼지 파인더 고도화.
-- [ ] **Call Hierarchy:** Source Insight를 대체하는 강력한 코드 분석 기능 구현.
-
-### 2단계: AI & 임베디드 워크플로우
-- [ ] **AI Integration:** `Gemini CLI`, `Claude Code` 및 `Ollama` 원격 서버를 터미널 워크플로우에 통합.
-- [ ] **Embedded Build:** WSL 내에서 Renesas CC-RX Windows 컴파일러를 호출하는 빌드 자동화 스크립트 작성.
-
----
-
-> *"Expertise is not about knowing everything, but about having the right tools and the habit of using them correctly."*
+## 🚀 향후 로드맵 (Next Steps)
+- [ ] **Neovim LSP 고도화:** Source Insight를 완벽 대체하는 코드 분석 환경 구축.
+- [ ] **AI CLI Integration:** `Gemini CLI`, `Claude Code`를 터미널 워크플로우에 통합.
+- [ ] **Embedded Automation:** WSL 내에서 Renesas CC-RX 빌드 자동화 스크립트 구현.
