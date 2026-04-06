@@ -4,10 +4,21 @@
 install_homebrew() {
     if ! command -v brew >/dev/null 2>&1; then
         echo "==> Homebrew not found. Installing Homebrew..."
-        # 비대화형 모드로 Homebrew 설치
+        
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # WSL/Linux 권한 문제 해결: /home/linuxbrew를 미리 생성하고 소유권을 현재 유저로 변경
+            if [ ! -d "/home/linuxbrew" ]; then
+                echo "==> Creating /home/linuxbrew with sudo (password may be required)..."
+                sudo mkdir -p /home/linuxbrew
+                sudo chown -R "$(whoami)" /home/linuxbrew
+            fi
+        fi
+
+        # 비대화형 모드로 Homebrew 설치 (이미 디렉토리가 준비되어 권한 에러 방지)
+        echo "==> Running Homebrew installer..."
         NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         
-        # 쉘 세션에 brew 경로 즉시 반영 (Linux 표준 경로)
+        # 쉘 세션에 즉시 반영
         if [ -d "/home/linuxbrew/.linuxbrew" ]; then
             eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
         fi
