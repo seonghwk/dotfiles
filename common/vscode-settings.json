@@ -1,0 +1,20 @@
+{
+    "vim.smartRelativeLine": true,
+    "vim.useSystemClipboard": true,
+    "editor.lineNumbers": "relative",
+    "vim.highlightedyank.enable": true,
+    "workbench.colorTheme": "Catppuccin Macchiato",
+    "workbench.iconTheme": "material-icon-theme",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Hack Nerd Font', 'Menlo', 'Monaco', 'Courier New', monospace",
+    "editor.fontSize": 14,
+    "editor.minimap.enabled": false,
+    "workbench.activityBar.location": "hidden",
+    "workbench.statusBar.visible": true,
+    "editor.renderWhitespace": "trailing",
+    "python.terminal.activateEnvInSelectedTerminal": true,
+    "jupyter.askForKernelRestart": false,
+    "editor.formatOnSave": true,
+    "C_Cpp.intelliSenseEngine": "Tag Parser",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "files.autoSave": "onFocusChange"
+}
