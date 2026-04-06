@@ -4,13 +4,38 @@
 
 ---
 
+## 🎯 프로젝트의 목표 (The Goal)
+- **Zero-GUI Workflow:** 마우스 없이 키보드만으로 모든 조작을 수행하는 환경 구축.
+- **Single Source of Truth:** 모든 설정(Terminal, Editor, IDE)을 `chezmoi`와 Git으로 중앙 통제.
+- **Cross-Platform Portability:** 어떤 OS에서도 5분 안에 동일한 환경(VS Code 포함) 복구.
+- **Thinking in Typing:** 모든 제어권을 타이핑으로 수행하여 "손가락으로 생각하는 개발" 지향.
+
+---
+
 ## 🏗️ 아키텍처 및 구조 (Architecture & Structure)
 
-... (중략) ...
+본 프로젝트는 **`chezmoi`**의 지능형 템플릿 기능을 활용하여, 서로 다른 4개의 OS 환경(Mac, WSL, RPi, Windows)을 단 하나의 저장소로 완벽하게 통제합니다.
+
+### 1. 디렉토리 구조 (Directory Map)
+```text
+dotfiles/
+├── common/                # [Universal] 모든 OS에서 공유하는 앱 설정 (VS Code settings/extensions)
+├── dot_zshrc              # [Static] 쉘 환경 설정 및 마스터 Alias (vcs, vcr 등)
+├── dot_tmux.conf          # [Static] 터미널 멀티플렉서 설정
+├── private_dot_config/    # [App-Specific] Neovim 등 상세 앱 설정
+│   └── nvim/init.lua
+├── run_once_before_...    # [Bootstrap] 패키지 자동 설치 로직
+│   ├── .sh.tmpl           #  -> macOS / Linux 전용 (brew/apt)
+│   └── .ps1.tmpl          #  -> Windows Native 전용 (choco)
+└── run_once_after_...     # [Post-Install] 플러그인 설치 및 심볼릭 링크 생성
+    ├── .sh.tmpl           #  -> macOS / Linux 전용
+    └── .ps1.tmpl          #  -> Windows Native 전용
+```
 
 ### 2. 설계 철학: 템플릿 격리 (Template Isolation)
-- **Win32 에러 방지:** Windows에서는 `.sh` 파일이 생성되지 않으므로 플랫폼 충돌이 차단됩니다.
-- **Single Source of Truth:** `common/` 내의 설정 파일을 각 OS의 경로에 링크하여 단일 진실 공급원을 유지합니다.
+모든 실행 스크립트(`.sh`, `.ps1`)는 **`.tmpl`** 확장자를 통해 관리됩니다. 이는 `chezmoi`가 실행 시점에 대상 OS를 감지하여 **해당 OS에 맞는 스크립트만 생성하고 실행**하게 합니다.
+- **Win32 에러 방지:** Windows에서는 유닉스용 `.sh` 파일이 생성조차 되지 않으므로, 플랫폼 충돌로 인한 에러가 원천 차단됩니다.
+- **Single Source of Truth:** `common/` 내의 설정 파일을 각 OS의 경로에 심볼릭 링크(또는 하드링크)로 연결하여, 단 하나의 파일 수정으로 모든 플랫폼의 IDE 설정을 동기화합니다.
 
 ---
 
@@ -47,15 +72,42 @@ chezmoi apply --force
 
 ## ✅ 현재까지 진행된 사항 (What We've Done)
 
-... (중략) ...
+### 1. 기반 인프라 구축
+- [x] **Multi-Platform Sync:** `chezmoi` 템플릿을 통한 Mac/WSL/RPi/Windows 통합 관리 체계.
+- [x] **Smart Installation:** OS 및 패키지 매니저별 자동 설치 스크립트 격리 구현.
+- [x] **Homebrew on Linux:** 저사양 RPi 및 WSL에서 최신 도구를 사용하기 위한 환경 최적화.
 
+### 2. 핵심 도구 설정 (The Golden Stack)
+- [x] **Shell (Zsh):** Starship, zoxide, fzf 기반의 스마트 네비게이션 및 마스터 Alias 구축.
+- [x] **Multiplexer (Tmux):** 전문가용 분할 레이아웃 및 세션 유지 (Prefix: `Ctrl-a`).
+- [x] **Editor (Neovim):** `Lazy.nvim` 기반의 모던 플러그인 체계 및 Catppuccin 테마.
+
+### 3. IDE 통합 (VS Code Master)
+- [x] **Universal Sync:** `common/vscode-settings.json` 하나로 전 OS IDE 설정 통합.
+- [x] **Extension Management:** 설치된 익스텐션을 `vscode-extensions.txt` 리스트 기반으로 자동 관리.
 - [x] **Disaster Recovery:** `vcs`, `vcr` 기반의 환경 저장 및 복구 체계 구축.
 
 ---
 
 ## 🛠️ 설치 및 복구 방법 (Quick Start)
 
-... (중략) ...
+### 🍏 macOS / 🐧 Linux / 💻 WSL
+```bash
+# 1. (WSL/Linux인 경우) Homebrew 표준 경로 선점 (단 한 번만 수행)
+sudo mkdir -p /home/linuxbrew && sudo chown -R $(whoami) /home/linuxbrew
+
+# 2. chezmoi를 통한 전체 설정 적용 및 도구 자동 설치
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply seonghwk
+```
+
+### 🪟 Windows (Native PowerShell)
+```powershell
+# 1. chezmoi 설치 (관리자 권한 PowerShell)
+winget install chezmoi  # 또는 choco install chezmoi
+
+# 2. 설정 적용
+chezmoi init --apply seonghwk
+```
 
 ---
 
