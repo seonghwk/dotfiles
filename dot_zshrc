@@ -13,8 +13,10 @@ eval "$(zoxide init zsh)"
 
 # 3. fzf (Fuzzy Finder) 활성화 및 옵션 설정
 if command -v fzf >/dev/null 2>&1; then
-  # 기본 옵션 (UI 설정)
-  export FZF_DEFAULT_OPTS="--height 40% --reverse --border"
+  # 기본 옵션 (UI 설정 및 숨김파일 토글 바인딩 추가)
+  export FZF_DEFAULT_OPTS="--height 40% --reverse --border \
+    --bind 'ctrl-h:change-prompt(Hidden > )+reload(fd --type f --hidden --strip-cwd-prefix --exclude .git)' \
+    --bind 'ctrl-u:change-prompt(Normal > )+reload(fd --type f --strip-cwd-prefix --exclude .git)'"
 
   # fzf 기본 검색 엔진을 fd로 교체 (파일만 검색, .git 무시)
   if command -v fd >/dev/null 2>&1; then
