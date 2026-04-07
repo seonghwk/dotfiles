@@ -56,3 +56,8 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
+
+
+#6. note alias 추가 for Capturing
+alias note='nvim ~/notes/$(date +%Y-%m-%d).md'
+
