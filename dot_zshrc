@@ -110,3 +110,9 @@ fif() {
     fzf --preview "rg --ignore-case --pretty --context 10 '$1' {}" \
         --bind "enter:become(nvim {})"
 }
+
+# fp: Fuzzy Preview (파일명 검색 + 실시간 내용 미리보기)
+fp() {
+  fzf --preview 'bat --color=always --style=numbers --line-range :500 {}' \
+      --bind "enter:become(nvim {})"
+}
