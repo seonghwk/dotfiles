@@ -1,10 +1,12 @@
 {{ if eq .chezmoi.os "windows" -}}
-# 1. Prompt & Zoxide (Out-String을 사용하여 단일 문자열로 변환)
-Invoke-Expression (&starship init powershell | Out-String)
-Invoke-Expression (&zoxide init powershell | Out-String)
+# 1. 환경 변수 설정 (최상단)
 $env:FZF_DEFAULT_OPTS = "--height 40% --reverse --border"
 
-# 2. Aliases (Unix-like experience)
+# 2. Prompt & Zoxide
+Invoke-Expression (&starship init powershell | Out-String)
+Invoke-Expression (&zoxide init powershell | Out-String)
+
+# 3. Aliases (Unix-like experience)
 function ls { eza --icons --group-directories-first $args }
 function ll { eza -l --icons --group-directories-first $args }
 function grep { rg $args }
@@ -14,31 +16,18 @@ Set-Alias lg lazygit
 Set-Alias vi nvim
 Set-Alias vim nvim
 
-# 3. vcs (VS Code Save) - PowerShell version
+# 4. vcs (VS Code Save)
 function vcs {
-    Write-Host "==> Backing up VS Code settings and extensions (Windows)..." -ForegroundColor Cyan
-    
+    Write-Host "==> Backing up VS Code settings and extensions..." -ForegroundColor Cyan
     $sourceDir = (chezmoi source-path)
     $appdata = $env:APPDATA
-    $settingsPath = "$appdata\Code\User\settings.json"
-    $extensionsPath = "$sourceDir\common\vscode-extensions.txt"
-    $targetSettings = "$sourceDir\common\vscode-settings.json"
-
-    # 1. 설정 백업
-    if (Test-Path $settingsPath) {
-        Copy-Item $settingsPath $targetSettings -Force
-    }
-    
-    # 2. 익스텐션 목록 추출 (UTF-8 No BOM 권장)
-    code --list-extensions | Out-File -FilePath $extensionsPath -Encoding utf8
-    
-    # 3. chezmoi 동기화 및 푸시
-    Push-Location $sourceDir
+    Copy-Item "$appdata\Code\User\settings.json" "$sourceDir\common\vscode-settings.json" -Force
+    code --list-extensions | Out-File -FilePath "$sourceDir\common\vscode-extensions.txt" -Encoding utf8
+    cd $sourceDir
     git add .
     git commit -m "feat: backup vscode settings and extensions via vcs (Windows)"
     git push
-    Pop-Location
-    
+    cd $HOME
     Write-Host "==> VS Code settings and extensions backed up successfully!" -ForegroundColor Green
 }
 
