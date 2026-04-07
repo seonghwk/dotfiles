@@ -12,12 +12,17 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 
 # 3. fzf (Fuzzy Finder) 활성화 및 옵션 설정
-# (설치 경로를 지능적으로 찾아 단축키 및 자동완성 활성화)
 if command -v fzf >/dev/null 2>&1; then
-  # 1. 환경 변수 먼저 설정
+  # 기본 옵션 (UI 설정)
   export FZF_DEFAULT_OPTS="--height 40% --reverse --border"
 
-  # 2. 설치 경로 감지 (Brew 우선, 그다음 표준 경로)
+  # fzf 기본 검색 엔진을 fd로 교체 (파일만 검색, .git 무시)
+  if command -v fd >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  fi
+
+  # 설치 경로 감지 및 스크립트 로드
   FZF_BASE_DIR=""
   if command -v brew >/dev/null 2>&1; then
     FZF_BASE_DIR="$(brew --prefix fzf)/shell"
@@ -29,13 +34,11 @@ if command -v fzf >/dev/null 2>&1; then
     FZF_BASE_DIR="/usr/share/doc/fzf/examples"
   fi
 
-  # 3. 스크립트 로드
   if [[ -n "$FZF_BASE_DIR" ]]; then
     [[ -f "$FZF_BASE_DIR/completion.zsh" ]] && source "$FZF_BASE_DIR/completion.zsh"
     [[ -f "$FZF_BASE_DIR/key-bindings.zsh" ]] && source "$FZF_BASE_DIR/key-bindings.zsh"
   fi
 fi
-
 
 # 4. 전문가용 Alias (별칭) 설정
 alias vi='nvim'
@@ -47,15 +50,9 @@ alias grep='rg'
 alias lg='lazygit'
 
 # 5. VS Code 백업 및 동기화 Alias (Terminal Master Tool)
-# vcs (VS Code Save): 현재 설정과 익스텐션을 백업하고 푸시
 vcs() {
-    # 1. 설정 백업 (common 폴더로 복사)
     cp "$HOME/Library/Application Support/Code/User/settings.json" "$(chezmoi source-path)/common/vscode-settings.json"
-    
-    # 2. 익스텐션 목록 추출
     code --list-extensions > "$(chezmoi source-path)/common/vscode-extensions.txt"
-    
-    # 3. chezmoi 동기화 및 푸시
     chezmoi cd
     git add .
     git commit -m "feat: backup vscode settings and extensions via vcs"
@@ -64,7 +61,6 @@ vcs() {
     exit
 }
 
-# vcr (VS Code Revert): 모든 수정을 취소하고 GitHub의 골든 스테이트로 복구
 vcr() {
     echo "==> Reverting to the latest Golden State from GitHub..."
     chezmoi cd
@@ -75,14 +71,12 @@ vcr() {
     echo "==> Your environment has been reset to the Golden State!"
 }
 
-# 5. History 설정 (명령어 기록 유지)
+# 6. History 설정 (명령어 기록 유지)
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
 setopt APPEND_HISTORY
 setopt SHARE_HISTORY
 
-
-#6. note alias 추가 for Capturing
+# 7. Note Alias (Capturing)
 alias note='nvim ~/notes/$(date +%Y-%m-%d).md'
-
