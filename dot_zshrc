@@ -11,8 +11,10 @@ eval "$(starship init zsh)"
 # 2. zoxide (Smarter cd) 활성화
 eval "$(zoxide init zsh)"
 
-# 3. fzf (Fuzzy Finder) 활성화
+# 3. fzf (Fuzzy Finder) 활성화 및 옵션 설정
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_OPTS="--height 40% --reverse --border"
+
 
 # 4. 전문가용 Alias (별칭) 설정
 alias ls='eza --icons --group-directories-first'

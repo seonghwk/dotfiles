@@ -2,6 +2,7 @@
 # 1. Prompt & Zoxide (Out-String을 사용하여 단일 문자열로 변환)
 Invoke-Expression (&starship init powershell | Out-String)
 Invoke-Expression (&zoxide init powershell | Out-String)
+$env:FZF_DEFAULT_OPTS = "--height 40% --reverse --border"
 
 # 2. Aliases (Unix-like experience)
 function ls { eza --icons --group-directories-first $args }
