@@ -48,6 +48,7 @@
 
  -- 5. 필수 단축키 (Keymaps)
  local keymap = vim.keymap
+ keymap.set("i", "jk", "<ESC>") -- jk로 입력 모드 탈출
  keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")      -- Space + e : 파일 탐색기
  keymap.set("n", "<leader>ff", ":Telescope find_files<CR>") -- Space + ff : 파일 찾기
  keymap.set("n", "<leader>fg", ":Telescope live_grep<CR>")  -- Space + fg : 내용 검색

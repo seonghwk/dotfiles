@@ -1,6 +1,12 @@
 {
     "vim.smartRelativeLine": true,
     "vim.useSystemClipboard": true,
+    "vim.insertModeKeyBindings": [
+        {
+            "before": ["j", "k"],
+            "after": ["<Esc>"]
+        }
+    ],
     "editor.lineNumbers": "relative",
     "vim.highlightedyank.enable": true,
     "workbench.colorTheme": "Catppuccin Macchiato",
