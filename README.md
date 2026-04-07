@@ -1,147 +1,86 @@
 # 🚀 Terminal-Centric Master Workflow
 
-본 저장소는 GUI의 한계를 넘어, 오직 터미널만으로 모든 개발 업무를 완벽하게 수행하기 위한 **"터미널 마스터의 성배"** 프로젝트입니다. macOS, Windows(WSL/Native), Raspberry Pi, NAS 등 다양한 환경에서 일관되고 강력한 생산성을 유지하는 것을 목표로 합니다.
+> **"손가락으로 생각하고 타이핑으로 소통한다."**  
+> 본 저장소는 GUI의 한계를 넘어, 모든 플랫폼에서 일관되고 강력한 생산성을 유지하기 위한 **개인 개발 인프라 프레임워크**입니다.
 
 ---
 
-## 🎯 프로젝트의 목표 (The Goal)
-- **Zero-GUI Workflow:** 마우스 없이 키보드만으로 모든 조작을 수행하는 환경 구축.
-- **Single Source of Truth:** 모든 설정(Terminal, Editor, IDE)을 `chezmoi`와 Git으로 중앙 통제.
-- **Cross-Platform Portability:** 어떤 OS에서도 5분 안에 동일한 환경(VS Code 포함) 복구.
-- **Thinking in Typing:** 모든 제어권을 타이핑으로 수행하여 "손가락으로 생각하는 개발" 지향.
+## 🏛️ 설계 철학 (Philosophy)
+- **Single Source of Truth:** 모든 설정은 오직 이 저장소에서 시작되며, Git으로 이력이 관리됩니다.
+- **Zero-Config Bootstrapping:** 새 기기에서 명령어 한 줄이면 5분 안에 전문 개발 환경이 복구됩니다.
+- **Platform Agnostic:** macOS, Windows(Native/WSL), Linux(RPi/NAS) 간의 벽을 허뭅니다.
+- **Minimalism & Speed:** 가장 빠르고 가벼운 최신 모던 유닉스 도구들로 구성된 '황금 스택'을 지향합니다.
 
 ---
 
-## 🏗️ 아키텍처 및 구조 (Architecture & Structure)
+## 🏗️ 시스템 아키텍처 (Architecture)
 
-본 프로젝트는 **`chezmoi`**의 지능형 템플릿 기능을 활용하여, 서로 다른 4개의 OS 환경(Mac, WSL, RPi, Windows)을 단 하나의 저장소로 완벽하게 통제합니다.
+본 프로젝트는 `chezmoi` 템플릿 엔진을 통해 OS별 특성을 지능적으로 처리합니다.
 
-### 1. 디렉토리 구조 (Directory Map)
-```text
-dotfiles/
-├── common/                # [Universal] 모든 OS에서 공유하는 앱 설정 (VS Code settings/extensions)
-├── dot_zshrc              # [Static] 쉘 환경 설정 및 마스터 Alias (vcs, vcr 등)
-├── dot_tmux.conf          # [Static] 터미널 멀티플렉서 설정
-├── private_dot_config/    # [App-Specific] Neovim 등 상세 앱 설정
-│   └── nvim/init.lua
-├── run_once_before_...    # [Bootstrap] 패키지 자동 설치 로직
-│   ├── .sh.tmpl           #  -> macOS / Linux 전용 (brew/apt)
-│   └── .ps1.tmpl          #  -> Windows Native 전용 (choco)
-└── run_once_after_...     # [Post-Install] 플러그인 설치 및 심볼릭 링크 생성
-    ├── .sh.tmpl           #  -> macOS / Linux 전용
-    └── .ps1.tmpl          #  -> Windows Native 전용
-```
-
-### 2. 설계 철학: 템플릿 격리 (Template Isolation)
-모든 실행 스크립트(`.sh`, `.ps1`)는 **`.tmpl`** 확장자를 통해 관리됩니다. 이는 `chezmoi`가 실행 시점에 대상 OS를 감지하여 **해당 OS에 맞는 스크립트만 생성하고 실행**하게 합니다.
-- **Win32 에러 방지:** Windows에서는 유닉스용 `.sh` 파일이 생성조차 되지 않으므로, 플랫폼 충돌로 인한 에러가 원천 차단됩니다.
-- **Single Source of Truth:** `common/` 내의 설정 파일을 각 OS의 경로에 심볼릭 링크(또는 하드링크)로 연결하여, 단 하나의 파일 수정으로 모든 플랫폼의 IDE 설정을 동기화합니다.
+### 📂 디렉토리 맵
+- `common/`: 전 플랫폼 공용 설정 (VS Code settings, extension list 등)
+- `dot_zshrc`: Zsh 환경 (Mac/Linux/WSL) - 전용 Alias 및 fzf 고도화 로직 포함
+- `dot_tmux.conf`: 터미널 멀티플렉서 (Prefix: `C-a`, Vim-like pane 이동)
+- `private_dot_config/nvim/`: Neovim IDE 설정 (Lazy.nvim, Treesitter, LSP 기반)
+- `Documents/PowerShell/`: Windows Native용 프로필 및 전용 함수
+- `run_once_before_...`: [OS 격리] 플랫폼별 패키지(brew/apt/choco) 자동 설치 스크립트
+- `run_once_after_...`: [OS 격리] 플러그인 설치 및 설정 심볼릭 링크 생성 로직
 
 ---
 
-## 🛡️ 안정성 및 복구 매뉴얼 (Stability & Recovery)
+## ✨ 핵심 기능 (Key Features)
 
-본 프로젝트는 **"언제든 1초 만에 최상의 상태로 복구 가능함"**을 전제로 설계되었습니다.
+### 1. 지능형 탐색 (Smart Navigation)
+- **fzf + fd:** `CTRL-T` 또는 `**[Tab]` 입력 시 일반 파일만 깔끔하게 검색.
+- **Dynamic Toggle:** 검색창에서 `CTRL-H`를 누르면 숨김 파일 포함, `CTRL-U`를 누르면 다시 일반 모드로 즉시 전환.
+- **zoxide:** `cd` 대신 `z` 명령어로 과거 방문했던 디렉토리를 기억하여 순간이동.
 
-### 1. VS Code Profile: 설정 샌드박스 (Sandbox)
-- **Default Profile:** `chezmoi`가 관리하는 **"Golden State"**입니다. 업무 및 핵심 개발에 사용합니다.
-- **Custom Profiles:** 새로운 실험이나 특정 언어 테스트를 위한 **Sandbox**로 활용하세요. 다른 프로필에서의 변경은 Default 설정에 영향을 주지 않습니다.
+### 2. IDE & Editor 통합
+- **VS Code Sync:** `common/vscode-settings.json` 하나로 모든 OS의 설정 통제.
+- **Neovim Mastery:** 터미널 내에서 LSP 기반 코드 분석 및 `jk` 단축키를 통한 고속 편집 모드 전환.
+- **Vim Mode Unity:** Neovim과 VS Code 모두에서 동일한 Vim 맵핑과 감각 유지.
 
-### 2. 저장 및 복구 워크플로우 (Save & Revert)
-터미널에서 제공되는 전용 별칭(Alias)을 통해 환경을 관리합니다.
-
-- **`vcs` (VS Code Save):**
-  - 현재 설치된 익스텐션 목록과 설정을 저장소에 백업하고 GitHub에 즉시 푸시합니다.
-  - *사용 시점:* 새로운 도구가 마음에 들어 내 환경의 표준으로 삼고 싶을 때.
-
-- **`vcr` (VS Code Revert):**
-  - 로컬의 모든 임시 변경 사항을 파기하고 GitHub의 최신 상태로 강제 복구합니다.
-  - *사용 시점:* 실험 중 설정이 꼬였거나, 이전의 안정적인 상태로 돌아가고 싶을 때.
-
-### 3. 강제 초기화 (Hard Reset)
-로컬 환경이 회생 불가능할 정도로 망가졌을 때:
-```bash
-# 로컬 저장소 강제 초기화 및 GitHub 최신본 적용
-chezmoi cd
-git fetch origin main && git reset --hard origin/main
-cd -
-chezmoi apply --force
-```
+### 3. 안정성 및 복구 (Disaster Recovery)
+- **`vcs` (VS Code Save):** 현재의 설정을 저장소에 백업하고 GitHub에 즉시 푸시.
+- **`vcr` (VS Code Revert):** 로컬의 잘못된 설정을 파기하고 GitHub의 '골든 스테이트'로 강제 복구.
 
 ---
 
-## 🎓 터미널 마스터 마스터리 로드맵 (Mastery Roadmap)
-
-터미널 마스터로 등극하기 위해 아래 우선순위에 따라 도구의 사용법을 익히는 것을 권장합니다.
-
-### 1️⃣ Rank 1: Tmux (공간 제어 - 공간의 주인)
-- **핵심:** 세션 유지 및 화면 분할. 터미널 하나를 무한한 작업 공간으로 확장합니다.
-- **마스터 포인트:** 세션 분리(Detach) 후 재접속, 윈도우 생성/이동, 패널 분할 및 레이아웃 전환.
-
-### 2️⃣ Rank 2: Neovim (편집 제어 - 생산의 심장)
-- **핵심:** Vim 모션을 통한 "생각의 속도"로 코딩. 단순 에디터를 넘어선 개인화된 IDE 구축.
-- **마스터 포인트:** 기본 모션(hjkl, w, b, f), LSP 기반 코드 분석(Go to Definition), 플러그인 관리.
-
-### 3️⃣ Rank 3: fzf (탐색 제어 - 검색의 혁명)
-- **핵심:** 퍼지 서치를 통한 모든 리소스의 즉각적 탐색.
-- **마스터 포인트:** 파일 찾기(`CTRL-T`), 히스토리 서치(`CTRL-R`), 디렉토리 이동(`ALT-C`) 생활화.
-
-### 4️⃣ Rank 4: ripgrep (검색 제어 - 전지적 시점)
-- **핵심:** 수백만 줄의 코드 베이스를 0.1초 만에 훑어내는 초고속 검색 엔진.
-- **마스터 포인트:** 대소문자 구분 검색, 정규식 활용, 특정 파일 확장자 필터링 검색.
-
-### 5️⃣ Rank 5: Modern Utilities (가속기 - 현대적 편의)
-- **zoxide (`z`):** 기억이 아닌 습관으로 이동하는 지능형 `cd`.
-- **bat / eza:** 가독성 높은 파일 확인과 아이콘 기반의 미려한 디렉토리 목록 조회.
-
----
-
-## ✅ 현재까지 진행된 사항 (What We've Done)
-
-### 1. 기반 인프라 구축
-- [x] **Multi-Platform Sync:** `chezmoi` 템플릿을 통한 Mac/WSL/RPi/Windows 통합 관리 체계.
-- [x] **Smart Installation:** OS 및 패키지 매니저별 자동 설치 스크립트 격리 구현.
-- [x] **Homebrew on Linux:** 저사양 RPi 및 WSL에서 최신 도구를 사용하기 위한 환경 최적화.
-
-### 2. 핵심 도구 설정 (The Golden Stack)
-- [x] **Shell (Zsh):** Starship, zoxide, fzf 기반의 스마트 네비게이션 및 마스터 Alias 구축.
-- [x] **Multiplexer (Tmux):** 전문가용 분할 레이아웃 및 세션 유지 (Prefix: `Ctrl-a`).
-- [x] **Editor (Neovim):** `Lazy.nvim` 기반의 모던 플러그인 체계 및 Catppuccin 테마.
-
-### 3. IDE 통합 (VS Code Master)
-- [x] **Universal Sync:** `common/vscode-settings.json` 하나로 전 OS IDE 설정 통합.
-- [x] **Extension Management:** 설치된 익스텐션을 `vscode-extensions.txt` 리스트 기반으로 자동 관리.
-- [x] **Disaster Recovery:** `vcs`, `vcr` 기반의 환경 저장 및 복구 체계 구축.
-
----
-
-## 🛠️ 설치 및 복구 방법 (Quick Start)
+## 🛠️ 퀵 스타트 (Quick Start)
 
 ### 🍏 macOS / 🐧 Linux / 💻 WSL
 ```bash
-# 1. (WSL/Linux인 경우) Homebrew 표준 경로 선점 (단 한 번만 수행)
+# 1. (WSL/Linux 전용) Homebrew 표준 경로 권한 확보
 sudo mkdir -p /home/linuxbrew && sudo chown -R $(whoami) /home/linuxbrew
 
-# 2. chezmoi를 통한 전체 설정 적용 및 도구 자동 설치
+# 2. 인프라 가동
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply seonghwk
 ```
 
 ### 🪟 Windows (Native PowerShell)
 ```powershell
-# 1. chezmoi 설치 (관리자 권한 PowerShell)
-winget install chezmoi  # 또는 choco install chezmoi
+# 1. 관리자 권한 PowerShell에서 설치
+winget install chezmoi
 
-# 2. 설정 적용
+# 2. 인프라 가동
 chezmoi init --apply seonghwk
 ```
 
 ---
 
-## 🚀 향후 로드맵 (Next Steps)
-- [ ] **Neovim LSP 고도화:** Source Insight를 완벽 대체하는 코드 분석 환경 구축.
-- [ ] **AI CLI Integration:** `Gemini CLI`, `Claude Code`를 터미널 워크플로우에 통합.
-- [ ] **Embedded Automation:** WSL 내에서 Renesas CC-RX 빌드 자동화 스크립트 구현.
+## 🎓 마스터 워크플로우 (How to use)
+
+1.  **공간 분할:** `tmux`를 실행하고 `C-a |` 또는 `C-a -`로 화면을 쪼개어 작업하세요.
+2.  **고속 편집:** `vi`를 입력하여 Neovim을 열고 `jk`로 입력 모드를 탈출하며 코딩하세요.
+3.  **지능형 검색:** 파일이 필요할 땐 `vi **[Tab]`을, 숨김 파일이 필요하면 그 안에서 `CTRL-H`를 누르세요.
+4.  **환경 보존:** 설정이 마음에 들게 바뀌었다면 터미널에서 `vcs`를 입력하여 전 세계 기기에 전파하세요.
 
 ---
 
-> *"Expertise is not about knowing everything, but about having the right tools and the habit of using them correctly."*
+## 🚀 로드맵 (Roadmap)
+- [ ] **Phase 4:** Neovim LSP 고도화 및 Source Insight급 Call Hierarchy 구현.
+- [ ] **Phase 5:** 임베디드 빌드(Renesas CC-RX) 자동화 래퍼 스크립트 구축.
+- [ ] **Phase 6:** Remote Ollama 연동을 통한 터미널 내 AI 코딩 에이전트 완성.
+
+---
+> *Generated by Gemini CLI - Crafting the future of terminal mastery.*
