@@ -106,9 +106,11 @@ frg() {
 # fif: Find In Files (특정 단어가 포함된 파일 목록 탐색)
 fif() {
   if [ ! "$#" -gt 0 ]; then echo "Need a string to search for!"; return 1; fi
-  rg --files-with-matches --no-messages "$1" | \
-    fzf --preview "rg --ignore-case --pretty --context 10 '$1' {}" \
-        --bind "enter:become(nvim {})"
+  rg --column --line-number --no-heading --color=always --smart-case "$1" | \
+    fzf --ansi \
+        --delimiter : \
+        --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+        --bind "enter:become(nvim {1} +{2})"
 }
 
 # fp: Fuzzy Preview (파일명 검색 + 실시간 내용 미리보기)
