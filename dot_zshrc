@@ -18,9 +18,9 @@ if command -v fzf >/dev/null 2>&1; then
     --bind 'ctrl-h:change-prompt(Hidden > )+reload(fd --type f --hidden --strip-cwd-prefix --exclude .git)' \
     --bind 'ctrl-u:change-prompt(Normal > )+reload(fd --type f --strip-cwd-prefix --exclude .git)'"
 
-  # fzf 기본 검색 엔진을 fd로 교체 (파일만 검색, .git 무시)
+  # fzf 기본 검색 엔진을 fd로 교체 (기본: 일반 파일만, .git 무시)
   if command -v fd >/dev/null 2>&1; then
-    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --hidden --exclude .git'
+    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --exclude .git'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
   fi
 
