@@ -1,12 +1,13 @@
 {{ if eq .chezmoi.os "windows" -}}
-# 1. 환경 변수 설정 (최상단)
+# 1. 환경 변수 설정 (fzf 전역 옵션)
+# (이 변수는 fzf.exe가 실행될 때 자동으로 읽어들입니다.)
 $env:FZF_DEFAULT_OPTS = "--height 40% --reverse --border"
 
-# 2. Prompt & Zoxide
+# 2. Prompt & Zoxide 초기화
 Invoke-Expression (&starship init powershell | Out-String)
 Invoke-Expression (&zoxide init powershell | Out-String)
 
-# 3. Aliases (Unix-like experience)
+# 3. Unix-like 별칭 및 함수
 function ls { eza --icons --group-directories-first $args }
 function ll { eza -l --icons --group-directories-first $args }
 function grep { rg $args }
@@ -16,18 +17,31 @@ Set-Alias lg lazygit
 Set-Alias vi nvim
 Set-Alias vim nvim
 
-# 4. vcs (VS Code Save)
+# 4. vcs (VS Code Save) - PowerShell 전용
 function vcs {
-    Write-Host "==> Backing up VS Code settings and extensions..." -ForegroundColor Cyan
+    Write-Host "==> Backing up VS Code settings and extensions (Windows)..." -ForegroundColor Cyan
+    
     $sourceDir = (chezmoi source-path)
     $appdata = $env:APPDATA
-    Copy-Item "$appdata\Code\User\settings.json" "$sourceDir\common\vscode-settings.json" -Force
-    code --list-extensions | Out-File -FilePath "$sourceDir\common\vscode-extensions.txt" -Encoding utf8
-    cd $sourceDir
+    $settingsPath = "$appdata\Code\User\settings.json"
+    $targetSettings = "$sourceDir\common\vscode-settings.json"
+    $targetExtensions = "$sourceDir\common\vscode-extensions.txt"
+
+    # 설정 파일 복사
+    if (Test-Path $settingsPath) {
+        Copy-Item $settingsPath $targetSettings -Force
+    }
+    
+    # 익스텐션 목록 추출
+    code --list-extensions | Out-File -FilePath $targetExtensions -Encoding utf8
+    
+    # Git 동기화
+    Push-Location $sourceDir
     git add .
     git commit -m "feat: backup vscode settings and extensions via vcs (Windows)"
     git push
-    cd $HOME
+    Pop-Location
+    
     Write-Host "==> VS Code settings and extensions backed up successfully!" -ForegroundColor Green
 }
 
