@@ -92,43 +92,24 @@ setopt SHARE_HISTORY
 alias note='nvim ~/notes/$(date +%Y-%m-%d).md'
 
 # 8. Advanced Search (rg + fzf)
-# frg: Interactive Ripgrep (실시간 검색 및 다중 선택 지원)
+# frg: Interactive Ripgrep (표준: 실시간 검색 및 점프)
 frg() {
   RELOAD='reload:rg --column --line-number --no-heading --color=always --smart-case {q} || :'
-  fzf --disabled --ansi --multi --query "$*" \
+  fzf --disabled --ansi --query "$*" \
       --bind "start:$RELOAD" --bind "change:$RELOAD" \
       --delimiter : \
       --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
       --preview-window 'right,60%,border-bottom,+{2}+3/3,~3' \
-      --bind "enter:execute([[ \$(echo {+1} | wc -w) -gt 1 ]] && nvim {+1} < /dev/tty || nvim {1} +{2} < /dev/tty)"
+      --bind "enter:execute(nvim {1} +{2} < /dev/tty)"
 }
 
-# fif: Find In Files (정적 검색 및 다중 선택 지원)
+# fif: Find In Files (표준: 특정 단어가 포함된 파일 목록 탐색)
 fif() {
   if [ ! "$#" -gt 0 ]; then echo "Need a string to search for!"; return 1; fi
   rg --column --line-number --no-heading --color=always --smart-case "$1" | \
-    fzf --ansi --multi \
+    fzf --ansi \
         --delimiter : \
         --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
-        --bind "enter:execute([[ \$(echo {+1} | wc -w) -gt 1 ]] && nvim {+1} < /dev/tty || nvim {1} +{2} < /dev/tty)"
-}
-
-# fp: Fuzzy Preview (파일명 탐색 및 다중 선택 지원)
-fp() {
-  fzf --multi --preview 'bat --color=always --style=numbers --line-range :500 {}' \
-      --bind "enter:execute(nvim {+f} < /dev/tty)"
-}
-
-# fl: Find Line (특정 파일 내 키워드 탐색 및 점프)
-fl() {
-  if [ ! "$#" -gt 0 ]; then echo "Usage: fl <file> [query]"; return 1; fi
-  local file=$1
-  shift
-  local query="${*:-.}"
-  rg --column --line-number --no-heading --color=always --smart-case "$query" "$file" | \
-    fzf --ansi --multi \
-        --delimiter : \
-        --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
-        --bind "enter:execute([[ \$(echo {+1} | wc -w) -gt 1 ]] && nvim {+1} < /dev/tty || nvim {1} +{2} < /dev/tty)"
+        --bind "enter:execute(nvim {1} +{2} < /dev/tty)"
 }
 

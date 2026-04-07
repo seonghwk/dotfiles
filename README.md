@@ -33,10 +33,8 @@
 ### 1. 지능형 탐색 및 고급 검색 (Smart Navigation & Advanced Search)
 - **fzf + fd:** `CTRL-T` 또는 `**[Tab]` 입력 시 일반 파일만 깔끔하게 검색.
 - **Dynamic Toggle:** 검색창에서 `CTRL-H`를 누르면 숨김 파일 포함, `CTRL-U`를 누르면 다시 일반 모드로 즉시 전환.
-- **frg (Interactive Ripgrep):** 모든 파일 내용을 실시간으로 뒤져서 원하는 코드 라인으로 즉시 점프.
-- **fif (Find In Files):** 특정 키워드가 포함된 파일 목록을 맥락(Context)과 함께 탐색.
-- **fp (Fuzzy Preview):** 파일명만 빠르게 검색하면서, 오른쪽에 그 파일의 실제 내용을 화려하게(Syntax Highlighting) 미리보기.
-- **zoxide:** `cd` 대신 `z` 명령어로 과거 방문했던 디렉토리를 기억하여 순간이동.
+- **frg (Interactive Ripgrep):** 실시간 검색을 통해 특정 코드 라인으로 즉시 점프.
+- **fif (Find In Files):** 특정 키워드가 포함된 모든 파일 목록을 탐색.
 
 ### 2. IDE & Editor 통합
 - **VS Code Sync:** `common/vscode-settings.json` 하나로 모든 OS의 설정 통제.
