@@ -11,6 +11,11 @@ eval "$(starship init zsh)"
 # 2. zoxide (Smarter cd) 활성화
 eval "$(zoxide init zsh)"
 
+# zoxide + fzf 고도화: zi 실행 시 폴더 내부 미리보기 (eza 활용)
+export _ZO_FZF_OPTS="--height 40% --reverse --border --prompt 'Jump > ' \
+  --preview 'eza -T -L 2 --icons --color=always --group-directories-first {2}' \
+  --preview-window 'right,50%,border-left'"
+
 # 3. fzf (Fuzzy Finder) 활성화 및 옵션 설정
 if command -v fzf >/dev/null 2>&1; then
   # 기본 옵션 (UI 설정 및 숨김파일 토글 바인딩 추가)
