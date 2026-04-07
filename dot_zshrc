@@ -23,12 +23,12 @@ if command -v fzf >/dev/null 2>&1; then
     export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --exclude .git'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 
-    # fzf completion (**) 커스터마이징: 초기 호출 시 fd 사용
+    # fzf completion (**) 커스터마이징: 초기 호출 시 fd 사용 (일반 파일만)
     _fzf_compgen_path() {
-      fd --type f --strip-cwd-prefix --exclude .git . "$1"
+      fd --type f --exclude .git . "$1"
     }
     _fzf_compgen_dir() {
-      fd --type d --strip-cwd-prefix --exclude .git . "$1"
+      fd --type d --exclude .git . "$1"
     }
   fi
 
