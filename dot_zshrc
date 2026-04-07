@@ -12,7 +12,20 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 
 # 3. fzf (Fuzzy Finder) 활성화 및 옵션 설정
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# (설치 경로를 자동으로 찾아 단축키 및 자동완성 활성화)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  FZF_SHELL_DIR="/opt/homebrew/opt/fzf/shell"
+elif [[ -d "/home/linuxbrew/.linuxbrew/opt/fzf/shell" ]]; then
+  FZF_SHELL_DIR="/home/linuxbrew/.linuxbrew/opt/fzf/shell"
+elif [[ -d "/usr/share/doc/fzf/examples" ]]; then
+  FZF_SHELL_DIR="/usr/share/doc/fzf/examples"
+fi
+
+if [[ -n "$FZF_SHELL_DIR" ]]; then
+  [[ -f "$FZF_SHELL_DIR/completion.zsh" ]] && source "$FZF_SHELL_DIR/completion.zsh"
+  [[ -f "$FZF_SHELL_DIR/key-bindings.zsh" ]] && source "$FZF_SHELL_DIR/key-bindings.zsh"
+fi
+
 export FZF_DEFAULT_OPTS="--height 40% --reverse --border"
 
 
