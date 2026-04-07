@@ -90,3 +90,23 @@ setopt SHARE_HISTORY
 
 # 7. Note Alias (Capturing)
 alias note='nvim ~/notes/$(date +%Y-%m-%d).md'
+
+# 8. Advanced Search (rg + fzf)
+# frg: Interactive Ripgrep (실시간 검색 및 파일 점프)
+frg() {
+  RELOAD='reload:rg --column --line-number --no-heading --color=always --smart-case {q} || :'
+  fzf --disabled --ansi --query "$*" \
+      --bind "start:$RELOAD" --bind "change:$RELOAD" \
+      --bind "enter:become(nvim {1} +{2})" \
+      --delimiter : \
+      --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+      --preview-window 'right,60%,border-bottom,+{2}+3/3,~3'
+}
+
+# fif: Find In Files (특정 단어가 포함된 파일 목록 탐색)
+fif() {
+  if [ ! "$#" -gt 0 ]; then echo "Need a string to search for!"; return 1; fi
+  rg --files-with-matches --no-messages "$1" | \
+    fzf --preview "rg --ignore-case --pretty --context 10 '$1' {}" \
+        --bind "enter:become(nvim {})"
+}
