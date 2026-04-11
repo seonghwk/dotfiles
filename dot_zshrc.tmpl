@@ -1,0 +1,138 @@
+# 0. Homebrew environment setup (macOS & Linux/WSL)
+if [[ -d "/opt/homebrew" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -d "/home/linuxbrew/.linuxbrew" ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+# 1. Enable Starship prompt
+eval "$(starship init zsh)"
+
+# 2. Enable zoxide (smarter cd)
+eval "$(zoxide init zsh)"
+
+# zoxide + fzf enhancement: directory tree preview with eza when using zi
+export _ZO_FZF_OPTS="--height 40% --reverse --border --prompt 'Jump > ' \
+  --preview 'eza -T -L 2 --icons --color=always --group-directories-first {2}' \
+  --preview-window 'right,50%,border-left'"
+
+# 3. Enable fzf (Fuzzy Finder) and configure options
+if command -v fzf >/dev/null 2>&1; then
+  # Default options: UI layout and hidden-file toggle bindings
+  export FZF_DEFAULT_OPTS="--height 40% --reverse --border --prompt 'Normal > ' \
+    --bind 'ctrl-h:change-prompt(Hidden > )+reload(fd --type f --hidden --strip-cwd-prefix --exclude .git)' \
+    --bind 'ctrl-u:change-prompt(Normal > )+reload(fd --type f --strip-cwd-prefix --exclude .git)'"
+
+  # Replace fzf default search engine with fd (regular files only, ignore .git)
+  if command -v fd >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix --exclude .git'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+    # Customize fzf completion (**): use fd on initial call (regular files only)
+    _fzf_compgen_path() {
+      fd --type f --exclude .git . "$1"
+    }
+    _fzf_compgen_dir() {
+      fd --type d --exclude .git . "$1"
+    }
+  fi
+
+  # Source fzf shell integration scripts.
+  # Modern fzf (>=0.48) provides --zsh which handles completion and key-bindings in one call.
+  # Fall back to manual path detection for older installations.
+  if fzf --zsh >/dev/null 2>&1; then
+    eval "$(fzf --zsh)"
+  else
+    FZF_BASE_DIR=""
+    if command -v brew >/dev/null 2>&1; then
+      FZF_BASE_DIR="$(brew --prefix fzf)/shell"
+    elif [[ -d "/usr/local/opt/fzf/shell" ]]; then
+      FZF_BASE_DIR="/usr/local/opt/fzf/shell"
+    elif [[ -d "/home/linuxbrew/.linuxbrew/opt/fzf/shell" ]]; then
+      FZF_BASE_DIR="/home/linuxbrew/.linuxbrew/opt/fzf/shell"
+    elif [[ -d "/usr/share/doc/fzf/examples" ]]; then
+      FZF_BASE_DIR="/usr/share/doc/fzf/examples"
+    fi
+
+    if [[ -n "$FZF_BASE_DIR" ]]; then
+      [[ -f "$FZF_BASE_DIR/completion.zsh" ]] && source "$FZF_BASE_DIR/completion.zsh"
+      [[ -f "$FZF_BASE_DIR/key-bindings.zsh" ]] && source "$FZF_BASE_DIR/key-bindings.zsh"
+    fi
+  fi
+fi
+
+# 4. Aliases
+alias vi='nvim'
+alias vim='nvim'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -l --icons --group-directories-first'
+alias cat='bat'
+alias grep='rg'
+alias lg='lazygit'
+
+# 5. VS Code backup and sync helpers
+vcs() {
+    local chezmoi_src
+    chezmoi_src="$(chezmoi source-path)"
+{{ if eq .chezmoi.os "darwin" -}}
+    local vscode_settings="$HOME/Library/Application Support/Code/User/settings.json"
+{{- else -}}
+    local vscode_settings="$HOME/.config/Code/User/settings.json"
+{{- end }}
+    cp "$vscode_settings" "$chezmoi_src/common/vscode-settings.json"
+    code --list-extensions > "$chezmoi_src/common/vscode-extensions.txt"
+    (
+        cd "$chezmoi_src" || return 1
+        git add .
+        git commit -m "feat: backup vscode settings and extensions via vcs"
+        git push
+    )
+    echo "==> VS Code settings and extensions backed up successfully!"
+}
+
+vcr() {
+    local chezmoi_src
+    chezmoi_src="$(chezmoi source-path)"
+    echo "==> Reverting to the latest Golden State from GitHub..."
+    (
+        cd "$chezmoi_src" || return 1
+        git fetch origin main
+        git reset --hard origin/main
+    )
+    chezmoi apply --force
+    echo "==> Your environment has been reset to the Golden State!"
+}
+
+# 6. Shell history settings
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt APPEND_HISTORY
+setopt SHARE_HISTORY
+
+# 7. Quick note alias
+alias note='nvim ~/notes/$(date +%Y-%m-%d).md'
+
+# 8. Advanced search functions (rg + fzf)
+# frg: Interactive ripgrep — live search and jump to line
+frg() {
+  RELOAD='reload:rg --column --line-number --no-heading --color=always --smart-case {q} || :'
+  fzf --disabled --ansi --query "$*" \
+      --bind "start:$RELOAD" --bind "change:$RELOAD" \
+      --delimiter : \
+      --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+      --preview-window 'right,60%,border-bottom,+{2}+3/3,~3' \
+      --bind "enter:execute(nvim {1} +{2} < /dev/tty)"
+}
+
+# fif: Find In Files — browse all files containing a keyword
+fif() {
+  if [ ! "$#" -gt 0 ]; then echo "Need a string to search for!"; return 1; fi
+  rg --column --line-number --no-heading --color=always --smart-case "$1" | \
+    fzf --ansi \
+        --delimiter : \
+        --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+        --bind "enter:execute(nvim {1} +{2} < /dev/tty)"
+}
+
+export PATH="$HOME/.local/bin:$PATH"
