@@ -135,8 +135,6 @@ fif() {
         --bind "enter:execute(nvim {1} +{2} < /dev/tty)"
 }
 
-<<<<<<< Updated upstream:dot_zshrc.tmpl
-=======
 # fkill: kill process with fzf
 fkill() {
   local pid
@@ -146,7 +144,23 @@ fkill() {
   fi
 }
 
-
-
->>>>>>> Stashed changes:dot_zshrc
 export PATH="$HOME/.local/bin:$PATH"
+
+# 9. Zsh shell enhancements
+# zsh-autosuggestions: fish-like history suggestions (→ or Ctrl+F to accept)
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+for _autosuggest_script in \
+  "$(brew --prefix 2>/dev/null)/share/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  "/usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh"; do
+  [[ -f "$_autosuggest_script" ]] && source "$_autosuggest_script" && break
+done
+unset _autosuggest_script
+
+# zsh-syntax-highlighting: color-code commands as you type (must be last)
+for _syntax_script in \
+  "$(brew --prefix 2>/dev/null)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
+  "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"; do
+  [[ -f "$_syntax_script" ]] && source "$_syntax_script" && break
+done
+unset _syntax_script
