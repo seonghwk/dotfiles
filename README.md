@@ -27,6 +27,44 @@ macOS, Linux/WSL, Windows에서 명령어 한 줄로 동일한 터미널 환경�
 
 ### macOS / Linux / WSL
 
+<<<<<<< Updated upstream
+=======
+### 📂 디렉토리 맵
+- `common/`: 전 플랫폼 공용 설정 (VS Code settings, extension list 등)
+- `dot_zshrc`: Zsh 환경 (Mac/Linux/WSL) - 전용 Alias 및 fzf 고도화 로직 포함
+- `dot_tmux.conf`: 터미널 멀티플렉서 (Prefix: `C-a`, Vim-like pane 이동)
+- `private_dot_config/nvim/`: Neovim IDE 설정 (Lazy.nvim, Treesitter, LSP 기반)
+- `Documents/PowerShell/`: Windows Native용 프로필 및 전용 함수
+- `Documents/terminal-exercises.md`: tmux·fzf·rg·chezmoi 실전 연습 문제집 (5 레벨)
+- `run_once_before_...`: [OS 격리] 플랫폼별 패키지(brew/apt/choco) 자동 설치 스크립트
+- `run_once_after_...`: [OS 격리] 플러그인 설치 및 설정 심볼릭 링크 생성 로직
+
+---
+
+## ✨ 핵심 기능 (Key Features)
+
+### 1. 지능형 탐색 및 고급 검색 (Smart Navigation & Advanced Search)
+- **fzf + fd:** `CTRL-T` 또는 `**[Tab]` 입력 시 일반 파일만 깔끔하게 검색.
+- **Dynamic Toggle:** 검색창에서 `CTRL-H`를 누르면 숨김 파일 포함, `CTRL-U`를 누르면 다시 일반 모드로 즉시 전환.
+- **frg (Interactive Ripgrep):** 실시간 검색을 통해 특정 코드 라인으로 즉시 점프.
+- **fif (Find In Files):** 특정 키워드가 포함된 모든 파일 목록을 탐색.
+
+### 2. IDE & Editor 통합
+- **VS Code Sync:** `common/vscode-settings.json` 하나로 모든 OS의 설정 통제.
+- **Neovim Mastery:** 터미널 내에서 LSP 기반 코드 분석 및 `jk` 단축키를 통한 고속 편집 모드 전환.
+- **Vim Mode Unity:** Neovim과 VS Code 모두에서 동일한 Vim 맵핑과 감각 유지.
+
+### 3. 안정성 및 복구 (Disaster Recovery)
+- **`vcs` (VS Code Save):** 현재의 설정을 저장소에 백업하고 GitHub에 즉시 푸시.
+- **`vcr` (VS Code Revert):** 로컬의 잘못된 설정을 파기하고 GitHub의 '골든 스테이트'로 강제 복구.
+- **`fkill` (Fuzzy Kill):** `fzf` 인터페이스로 실행 중인 프로세스를 선택해서 종료.
+
+---
+
+## 🛠️ 퀵 스타트 (Quick Start)
+
+### 🍏 macOS / 🐧 Linux / 💻 WSL
+>>>>>>> Stashed changes
 ```bash
 # Linux/WSL 전용: Homebrew 설치 경로 권한 확보
 sudo mkdir -p /home/linuxbrew && sudo chown -R $(whoami) /home/linuxbrew
@@ -147,3 +185,5 @@ git add . && git commit -m "chore: update config" && git push
 # 다른 기기에서 최신 상태 적용
 chezmoi update
 ```
+=======
+> *Crafting the future of terminal mastery.*

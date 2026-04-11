@@ -66,7 +66,7 @@ alias vi='nvim'
 alias vim='nvim'
 alias ls='eza --icons --group-directories-first'
 alias ll='eza -l --icons --group-directories-first'
-alias cat='bat'
+alias cat='bat --style=plain'
 alias grep='rg'
 alias lg='lazygit'
 
@@ -135,4 +135,18 @@ fif() {
         --bind "enter:execute(nvim {1} +{2} < /dev/tty)"
 }
 
+<<<<<<< Updated upstream:dot_zshrc.tmpl
+=======
+# fkill: kill process with fzf
+fkill() {
+  local pid
+  pid=$(ps aux | tail -n +2 | fzf --multi --preview 'echo {}' | awk '{print $2}')
+  if [ -n "$pid" ]; then
+    echo "$pid" | xargs kill -9
+  fi
+}
+
+
+
+>>>>>>> Stashed changes:dot_zshrc
 export PATH="$HOME/.local/bin:$PATH"
