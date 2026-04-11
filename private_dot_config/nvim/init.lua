@@ -118,19 +118,20 @@ require("lazy").setup({
   },
 
   -- ── Syntax Highlighting ───────────────────────────────────────────────────
+  -- nvim-treesitter v1.0+ (rewrite): nvim-treesitter.configs module removed.
+  -- Highlight/indent are now handled natively by Neovim's vim.treesitter.
+  -- setup() only manages parser installation; parsers activate automatically.
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
+      require("nvim-treesitter").setup({
         ensure_installed = {
           "lua", "python", "javascript", "typescript", "tsx",
           "html", "css", "json", "yaml", "toml", "markdown",
           "bash", "go", "rust", "c", "cpp",
         },
         auto_install = true,
-        highlight = { enable = true },
-        indent = { enable = true },
       })
     end,
   },
@@ -159,10 +160,9 @@ require("lazy").setup({
         automatic_installation = true,
       })
 
-      local lspconfig = require("lspconfig")
       local capabilities = vim.lsp.protocol.make_client_capabilities()
 
-      -- Try to extend capabilities with nvim-cmp (loaded later)
+      -- Extend capabilities with nvim-cmp if available
       local ok_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       if ok_cmp then
         capabilities = cmp_nvim_lsp.default_capabilities(capabilities)
@@ -173,37 +173,38 @@ require("lazy").setup({
         local map = function(keys, func, desc)
           vim.keymap.set("n", keys, func, { buffer = bufnr, desc = "LSP: " .. desc })
         end
-        map("gd", vim.lsp.buf.definition,      "Go to Definition")
-        map("gD", vim.lsp.buf.declaration,     "Go to Declaration")
-        map("gr", vim.lsp.buf.references,      "Find References")
-        map("gi", vim.lsp.buf.implementation,  "Go to Implementation")
-        map("K",  vim.lsp.buf.hover,           "Hover Documentation")
-        map("<leader>rn", vim.lsp.buf.rename,  "Rename Symbol")
+        map("gd", vim.lsp.buf.definition,          "Go to Definition")
+        map("gD", vim.lsp.buf.declaration,         "Go to Declaration")
+        map("gr", vim.lsp.buf.references,          "Find References")
+        map("gi", vim.lsp.buf.implementation,      "Go to Implementation")
+        map("K",  vim.lsp.buf.hover,               "Hover Documentation")
+        map("<leader>rn", vim.lsp.buf.rename,      "Rename Symbol")
         map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
-        map("[d", vim.diagnostic.goto_prev,    "Prev Diagnostic")
-        map("]d", vim.diagnostic.goto_next,    "Next Diagnostic")
+        map("[d", vim.diagnostic.goto_prev,        "Prev Diagnostic")
+        map("]d", vim.diagnostic.goto_next,        "Next Diagnostic")
         map("<leader>d", vim.diagnostic.open_float, "Show Diagnostic")
       end
 
-      -- Configure each server
-      local servers = {
-        lua_ls = {
-          settings = { Lua = { diagnostics = { globals = { "vim" } } } },
-        },
-        pyright = {},
-        ts_ls = {},
-        bashls = {},
-        jsonls = {},
-        yamlls = {},
-        html = {},
-        cssls = {},
-      }
+      -- Neovim 0.11+ native API: vim.lsp.config / vim.lsp.enable
+      -- nvim-lspconfig provides per-server defaults (cmd, filetypes, root_dir)
+      -- which are merged automatically when vim.lsp.enable() is called.
 
-      for server, config in pairs(servers) do
-        config.on_attach = on_attach
-        config.capabilities = capabilities
-        lspconfig[server].setup(config)
-      end
+      -- Apply shared settings to all servers
+      vim.lsp.config("*", {
+        capabilities = capabilities,
+        on_attach = on_attach,
+      })
+
+      -- Server-specific overrides
+      vim.lsp.config("lua_ls", {
+        settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+      })
+
+      -- Activate servers
+      vim.lsp.enable({
+        "lua_ls", "pyright", "ts_ls", "bashls",
+        "jsonls", "yamlls", "html", "cssls",
+      })
 
       -- Diagnostic display settings
       vim.diagnostic.config({
