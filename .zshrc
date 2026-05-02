@@ -24,6 +24,6 @@ setopt SHARE_HISTORY
 eval "$(starship init zsh)"
 
 # dotfiles
-dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 
