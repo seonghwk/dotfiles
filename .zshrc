@@ -26,4 +26,7 @@ eval "$(starship init zsh)"
 # dotfiles
 alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
+# shortcut for obsidian note
+alias n='cd ~/Notes/00_Inbox && nvim'
+
 
